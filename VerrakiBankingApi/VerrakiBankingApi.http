@@ -1,0 +1,6 @@
+@VerrakiBankingApi_HostAddress = http://localhost:5049
+
+GET {{VerrakiBankingApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
