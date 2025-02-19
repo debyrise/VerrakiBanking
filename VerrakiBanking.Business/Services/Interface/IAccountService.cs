@@ -11,9 +11,9 @@ namespace VerrakiBanking.Business.Services.Interface
 
     public interface IAccountService
     {
-        Task<decimal> GetBalanceAsync(int accountId);
-        Task<decimal> DepositAsync(int accountId, decimal amount, string description);
-        Task<decimal> WithdrawAsync(int accountId, decimal amount, string description);
+        Task<decimal> GetBalanceAsync(string accountNo);
+        Task<decimal> DepositAsync(string accountNo, decimal amount, string description);
+        Task<decimal> WithdrawAsync(string accountNo, decimal amount, string description);
     }
 
 }

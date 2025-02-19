@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VerrakiBanking.Business.Services.Interface;
 using VerrakiBanking.Data.DTOs;
@@ -17,14 +18,15 @@ namespace VerrakiBankingApi.Controllers
             _accountService = accountService;
         }
 
-        // Endpoint to get the balance of an account
-        [HttpGet("balance/{accountId}")]
-        public async Task<IActionResult> GetBalance(int accountId)
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        [HttpGet("balance/{accountNo}")]
+        public async Task<IActionResult> GetBalance(string accountNo)
         {
             try
             {
-                var balance = await _accountService.GetBalanceAsync(accountId);
-                return Ok(new { AccountId = accountId, Balance = balance });
+                var balance = await _accountService.GetBalanceAsync(accountNo);
+                return Ok(new { AccountId = accountNo, Balance = balance });
             }
             catch (Exception ex)
             {
@@ -32,16 +34,15 @@ namespace VerrakiBankingApi.Controllers
             }
         }
 
-        // Endpoint to deposit money into an account
-        [HttpPost("deposit/{accountId}")]
-        public async Task<IActionResult> Deposit(int accountId, [FromBody] DepositRequest request)
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        [HttpPost("deposit/{accountNo}")]
+        public async Task<IActionResult> Deposit(string accountNo, [FromBody] DepositRequest request)
         {
             try
             {
-                // Call DepositAsync and get the updated balance
-                var newBalance = await _accountService.DepositAsync(accountId, request.Amount, request.Description);
+                var newBalance = await _accountService.DepositAsync(accountNo, request.Amount, request.Description);
 
-                // Check if deposit was successful (assuming any non-negative balance indicates success)
                 if (newBalance >= 0)
                 {
                     return Ok(new { Message = "Deposit successful", NewBalance = newBalance });
@@ -57,17 +58,15 @@ namespace VerrakiBankingApi.Controllers
             }
         }
 
-
-        // Endpoint to withdraw money from an account
-        [HttpPost("withdraw/{accountId}")]
-        public async Task<IActionResult> Withdraw(int accountId, [FromBody] decimal amount, string description)
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        [HttpPost("withdraw/{accountNo}")]
+        public async Task<IActionResult> Withdraw(string accountNo, [FromBody] decimal amount, string description)
         {
             try
             {
-                // Call WithdrawAsync and get the updated balance
-                var newBalance = await _accountService.WithdrawAsync(accountId, amount, description);
+                var newBalance = await _accountService.WithdrawAsync(accountNo, amount, description);
 
-                // Check if withdrawal was successful based on the balance
                 if (newBalance >= 0)
                 {
                     return Ok(new { Message = "Withdrawal successful", NewBalance = newBalance });

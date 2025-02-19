@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,20 +23,21 @@ namespace VerrakiBanking.Business.Services.Implemetation
         }
 
         // Get the balance of the account
-        public async Task<decimal> GetBalanceAsync(int accountId)
+        public async Task<decimal> GetBalanceAsync(string accountNo)
         {
-            var account = await _context.Accounts.FindAsync(accountId);
+            var account = await _context.Accounts.FirstOrDefaultAsync(a => a.AccountNumber == accountNo);
             if (account == null)
                 throw new Exception("Account not found.");
             return account.Balance;
         }
 
+
         // Deposit into the account
-        public async Task<decimal> DepositAsync(int accountId, decimal amount, string description)
+        public async Task<decimal> DepositAsync(string accountNo, decimal amount, string description)
         {
-            if (amount <= 0)  // Check for negative or zero amount
+            if (amount <= 0)  
                 throw new Exception("Withdrawal amount must be greater than zero.");
-            var account = await _context.Accounts.FindAsync(accountId);
+            var account = await _context.Accounts.FirstOrDefaultAsync(a => a.AccountNumber == accountNo);
             if (account == null)
                 throw new Exception("Account not found.");
 
@@ -45,7 +47,7 @@ namespace VerrakiBanking.Business.Services.Implemetation
             // Record the transaction
             var transaction = new Transactions
             {
-                AccountId = accountId,
+                AccountId = account.Id,
                 Amount = amount,
                 Date = DateTime.Now,
                 TransactionType = TransactionType.Deposit,
@@ -58,24 +60,22 @@ namespace VerrakiBanking.Business.Services.Implemetation
         }
 
         // Withdraw from the account
-        public async Task<decimal> WithdrawAsync(int accountId, decimal amount, string description)
+        public async Task<decimal> WithdrawAsync(string accountNo, decimal amount, string description)
         {
             if (amount <= 0)  
                 throw new Exception("Withdrawal amount must be greater than zero.");
-            var account = await _context.Accounts.FindAsync(accountId);
+            var account = await _context.Accounts.FirstOrDefaultAsync(a => a.AccountNumber == accountNo);
             if (account == null)
                 throw new Exception("Account not found.");
 
             if (account.Balance < amount)
                 throw new Exception("Insufficient funds.");
 
-            // Update balance
             account.Balance -= amount;
 
-            // Record the transaction
             var transaction = new Transactions
             {
-                AccountId = accountId,
+                AccountId = account.Id,
                 Amount = amount,
                 Date = DateTime.Now,
                 TransactionType = TransactionType.Withdrawal,

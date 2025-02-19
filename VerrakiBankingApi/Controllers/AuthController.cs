@@ -39,10 +39,10 @@ namespace VerrakiBankingApi.Controllers
             var result = await _authService.LoginUserAsync(model);
 
             if (!result.Succeeded)
-                return Unauthorized("Invalid credentials.");
+                return Unauthorized(result.Message);  
 
-            // Generate JWT token or other response here
-            return Ok(new { Message = "Login successful!" });
+            return Ok(new { Message = result.Message, Token = result.Token });
         }
+
     }
 }
