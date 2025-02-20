@@ -16,7 +16,6 @@ namespace VerrakiBanking.Data.DbContext
         {
         }
 
-        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Accounts> Accounts { get; set; }
         public DbSet<Transactions> Transactions { get; set; }
     }

@@ -8,16 +8,13 @@ using VerrakiBanking.Data.Entity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add Identity services
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-// Add JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = "Bearer";
@@ -25,7 +22,6 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    // Ensure you have the correct key in appsettings.json
     var secretKey = builder.Configuration["Jwt:SecretKey"];
     if (string.IsNullOrEmpty(secretKey))
     {
@@ -36,22 +32,19 @@ builder.Services.AddAuthentication(options =>
     options.Audience = builder.Configuration["Jwt:Audience"];
     options.RequireHttpsMetadata = false;
 
-    // Add the key for signing and validation
     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero,  // Optional: to adjust for clock skew if needed
+        ClockSkew = TimeSpan.Zero,  
         IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(secretKey)) // Add your Secret Key here
     };
 });
 
-// Register application services
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IAuthservice, AuthService>();
 
-// Add controllers and Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -62,7 +55,6 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1"
     });
 
-    // Adding Bearer Token Authorization to Swagger
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -89,7 +81,6 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

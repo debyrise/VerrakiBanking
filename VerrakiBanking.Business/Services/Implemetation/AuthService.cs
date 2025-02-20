@@ -83,37 +83,34 @@ namespace VerrakiBanking.Business.Services.Implemetation
             if (!result.Succeeded)
                 return new LoginResult { Succeeded = false, Message = "Invalid credentials." };
 
-            // Generate JWT Token if login is successful
-            var token = GenerateJwtToken(user); // Calling the method to generate the token
+            var token = GenerateJwtToken(user); 
 
             return new LoginResult { Succeeded = true, Message = "Login successful!", Token = token };
         }
 
 
-        // Method to generate the JWT token
         private string GenerateJwtToken(ApplicationUser user)
         {
             var claims = new[]
             {
-        new Claim(JwtRegisteredClaimNames.Sub, user.UserName), // User's name
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // Unique identifier for the token
-        new Claim(ClaimTypes.NameIdentifier, user.Id), // User's ID
-        // Add any other claims like user roles or email as needed
+        new Claim(JwtRegisteredClaimNames.Sub, user.UserName), 
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), 
+        new Claim(ClaimTypes.NameIdentifier, user.Id),
          };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"])); // Secret key from config
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"])); 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"], // Issuer from config
-                audience: _configuration["Jwt:Audience"], // Audience from config
+                issuer: _configuration["Jwt:Issuer"], 
+                audience: _configuration["Jwt:Audience"], 
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(30), // Token expiration time
+                expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: creds
             );
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            return tokenHandler.WriteToken(token); // Returns the JWT token as a string
+            return tokenHandler.WriteToken(token); 
         }
 
         public class LoginResult

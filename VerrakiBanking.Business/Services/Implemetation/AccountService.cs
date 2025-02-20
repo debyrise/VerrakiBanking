@@ -22,7 +22,6 @@ namespace VerrakiBanking.Business.Services.Implemetation
             _context = context;
         }
 
-        // Get the balance of the account
         public async Task<decimal> GetBalanceAsync(string accountNo)
         {
             var account = await _context.Accounts.FirstOrDefaultAsync(a => a.AccountNumber == accountNo);
@@ -32,7 +31,6 @@ namespace VerrakiBanking.Business.Services.Implemetation
         }
 
 
-        // Deposit into the account
         public async Task<decimal> DepositAsync(string accountNo, decimal amount, string description)
         {
             if (amount <= 0)  
@@ -41,10 +39,8 @@ namespace VerrakiBanking.Business.Services.Implemetation
             if (account == null)
                 throw new Exception("Account not found.");
 
-            // Update balance
             account.Balance += amount;
 
-            // Record the transaction
             var transaction = new Transactions
             {
                 AccountId = account.Id,
@@ -59,7 +55,6 @@ namespace VerrakiBanking.Business.Services.Implemetation
             return account.Balance;
         }
 
-        // Withdraw from the account
         public async Task<decimal> WithdrawAsync(string accountNo, decimal amount, string description)
         {
             if (amount <= 0)  
